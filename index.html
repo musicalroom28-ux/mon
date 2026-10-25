@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제6대 한국조명가협회 이사장 후보 기호 2번 문종태</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter & Spoqa Han Sans Neo vibe) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-white">
+
+    <!-- Header Section -->
+    <header class="w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-4xl mx-auto px-4 py-4 md:py-6 text-center">
+            <span class="inline-block bg-amber-500 text-slate-950 font-ext500 text-xs md:text-sm px-3 py-1 rounded-full mb-2 uppercase tracking-widest shadow-sm">
+                기호 2번
+            </span>
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white drop-shadow-md">
+                제6대 한국조명가협회 이사장 후보 <span class="text-amber-400">문종태</span>
+            </h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-4 py-8 md:py-12">
+        <div class="w-full max-w-3xl mx-auto flex flex-col items-center">
+            
+            <!-- Video Container with 16:9 Aspect Ratio -->
+            <div class="w-full bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-slate-800 transition-transform duration-300 hover:border-amber-500/50">
+                <div class="relative w-full" style="padding-bottom: 56.25%;">
+                    <iframe
+                        id="promo-video"
+                        class="absolute top-0 left-0 w-full h-full border-0"
+                        src="https://www.youtube.com/embed/-6KC_5nslHE?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1"
+                        title="제6대 한국조명가협회 이사장 후보 기호 2번 문종태 홍보 영상"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
+                    <!-- 브라우저 자동재생 정책상 음소거로 시작하므로, 소리 켜기 버튼 제공 -->
+                    <button id="unmute-btn" type="button"
+                        class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm md:text-base px-5 py-2.5 rounded-full shadow-lg">
+                        🔊 소리 켜기
+                    </button>
+                </div>
+            </div>
+
+            <!-- Description / Subtext -->
+            <div class="mt-6 text-center">
+                <p class="text-slate-400 text-sm md:text-base font-medium">
+                    한국조명가협회의 새로운 도약과 발전을 위해 늘 함께하겠습니다.
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="w-full bg-slate-950/60 border-t border-slate-800/60 py-6 text-center text-slate-500 text-xs md:text-sm">
+        <p>&copy; 2026 제6대 한국조명가협회 이사장 후보 기호 2번 문종태 선거대책위원회. All rights reserved.</p>
+    </footer>
+
+    <!-- YouTube IFrame API: 페이지 열리면 바로 재생, 첫 터치/클릭 시 소리 켜기 -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        var player;
+        var unmuteBtn = document.getElementById('unmute-btn');
+
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('promo-video', {
+                events: {
+                    onReady: function (e) {
+                        e.target.mute();
+                        e.target.playVideo();
+                    }
+                }
+            });
+        }
+
+        function unmuteVideo() {
+            if (!player || !player.unMute) return;
+            player.unMute();
+            player.setVolume(100);
+            player.playVideo();
+            unmuteBtn.style.display = 'none';
+            document.removeEventListener('click', unmuteVideo);
+            document.removeEventListener('touchstart', unmuteVideo);
+        }
+
+        unmuteBtn.addEventListener('click', unmuteVideo);
+        document.addEventListener('click', unmuteVideo);
+        document.addEventListener('touchstart', unmuteVideo);
+    </script>
+
+</body>
+</html>
