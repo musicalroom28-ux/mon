@@ -43,6 +43,8 @@
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen>
                     </iframe>
+                    <!-- 투명 오버레이: 영상 위 첫 터치를 페이지가 받아 즉시 소리를 켭니다 (소리 켜지면 제거) -->
+                    <div id="sound-overlay" class="absolute inset-0 z-10 cursor-pointer" style="background: transparent;"></div>
                 </div>
             </div>
 
@@ -65,28 +67,38 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player;
-        var soundEvents = ['click', 'touchstart', 'pointerdown', 'keydown'];
+        var soundEvents = ['pointerdown', 'touchstart', 'mousedown', 'click', 'keydown'];
+
+        // 첫 입력 즉시 소리 켜기 (페이지 어디든, 영상 위 포함) - API 로딩 전부터 대기
+        soundEvents.forEach(function (ev) {
+            document.addEventListener(ev, unmuteVideo, true);
+        });
+
+        function hasSound() {
+            if (!player || !player.getPlayerState) return false;
+            return player.getPlayerState() === YT.PlayerState.PLAYING && !player.isMuted();
+        }
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('promo-video', {
                 events: {
                     onReady: function (e) {
+                        // 1차: 소리 켠 상태로 바로 재생 시도
                         e.target.unMute();
                         e.target.setVolume(100);
                         e.target.playVideo();
-                        // 브라우저가 소리 있는 자동재생을 막은 경우: 음소거로 재생을 이어가고
-                        // 화면 어디든 처음 터치/클릭/키 입력 시 자동으로 소리를 켭니다 (버튼 없음)
+                        // 2차: 브라우저가 소리 자동재생을 막았으면 음소거로라도 영상은 바로 재생
                         setTimeout(function () {
-                            var state = player.getPlayerState();
-                            var playing = state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING;
-                            if (!playing || player.isMuted()) {
+                            if (hasSound()) {
+                                cleanup();
+                            } else {
                                 player.mute();
                                 player.playVideo();
-                                soundEvents.forEach(function (ev) {
-                                    document.addEventListener(ev, unmuteVideo, true);
-                                });
                             }
-                        }, 1000);
+                        }, 600);
+                    },
+                    onStateChange: function () {
+                        if (hasSound()) cleanup();
                     }
                 }
             });
@@ -97,6 +109,12 @@
             player.unMute();
             player.setVolume(100);
             player.playVideo();
+            cleanup();
+        }
+
+        function cleanup() {
+            var overlay = document.getElementById('sound-overlay');
+            if (overlay) overlay.remove();
             soundEvents.forEach(function (ev) {
                 document.removeEventListener(ev, unmuteVideo, true);
             });
