@@ -38,16 +38,11 @@
                     <iframe
                         id="promo-video"
                         class="absolute top-0 left-0 w-full h-full border-0"
-                        src="https://www.youtube.com/embed/-6KC_5nslHE?autoplay=1&mute=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1"
+                        src="https://www.youtube.com/embed/-6KC_5nslHE?autoplay=1&playsinline=1&rel=0&modestbranding=1&enablejsapi=1"
                         title="제6대 한국조명가협회 이사장 후보 기호 2번 문종태 홍보 영상"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                         allowfullscreen>
                     </iframe>
-                    <!-- 브라우저 자동재생 정책상 음소거로 시작하므로, 소리 켜기 버튼 제공 -->
-                    <button id="unmute-btn" type="button"
-                        class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm md:text-base px-5 py-2.5 rounded-full shadow-lg">
-                        🔊 소리 켜기
-                    </button>
                 </div>
             </div>
 
@@ -66,18 +61,32 @@
         <p>&copy; 2026 제6대 한국조명가협회 이사장 후보 기호 2번 문종태 선거대책위원회. All rights reserved.</p>
     </footer>
 
-    <!-- YouTube IFrame API: 페이지 열리면 바로 재생, 첫 터치/클릭 시 소리 켜기 -->
+    <!-- YouTube IFrame API: 페이지 열리면 소리와 함께 바로 재생 -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         var player;
-        var unmuteBtn = document.getElementById('unmute-btn');
+        var soundEvents = ['click', 'touchstart', 'pointerdown', 'keydown'];
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('promo-video', {
                 events: {
                     onReady: function (e) {
-                        e.target.mute();
+                        e.target.unMute();
+                        e.target.setVolume(100);
                         e.target.playVideo();
+                        // 브라우저가 소리 있는 자동재생을 막은 경우: 음소거로 재생을 이어가고
+                        // 화면 어디든 처음 터치/클릭/키 입력 시 자동으로 소리를 켭니다 (버튼 없음)
+                        setTimeout(function () {
+                            var state = player.getPlayerState();
+                            var playing = state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING;
+                            if (!playing || player.isMuted()) {
+                                player.mute();
+                                player.playVideo();
+                                soundEvents.forEach(function (ev) {
+                                    document.addEventListener(ev, unmuteVideo, true);
+                                });
+                            }
+                        }, 1000);
                     }
                 }
             });
@@ -88,14 +97,10 @@
             player.unMute();
             player.setVolume(100);
             player.playVideo();
-            unmuteBtn.style.display = 'none';
-            document.removeEventListener('click', unmuteVideo);
-            document.removeEventListener('touchstart', unmuteVideo);
+            soundEvents.forEach(function (ev) {
+                document.removeEventListener(ev, unmuteVideo, true);
+            });
         }
-
-        unmuteBtn.addEventListener('click', unmuteVideo);
-        document.addEventListener('click', unmuteVideo);
-        document.addEventListener('touchstart', unmuteVideo);
     </script>
 
 </body>
